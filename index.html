@@ -3244,51 +3244,59 @@ function showPortal(){
   document.getElementById('portal').style.display='flex';
 }
 </script>
-<script>
-// ── AUTH ──────────────────────────────────────────────────────────────────────
-(function(){
-  var SK = 'gex_ok';
-  var CU = 'alexandre@elena'+'horto.com';
-  var CP = 'elenha'+'@2026';
+<script type="module">
+// ── FIREBASE AUTH ─────────────────────────────────────────────────────────────
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
-  function unlock(){
-    var ls = document.getElementById('login-screen');
-    if(ls) ls.style.display='none';
-    sessionStorage.setItem(SK,'1');
-  }
+const _fbApp  = initializeApp({
+  apiKey:            "AIzaSyAMkoUCXomhVoH9M1ZJRqcAkPL0YUojv2k",
+  authDomain:        "dashboard-elena.firebaseapp.com",
+  projectId:         "dashboard-elena",
+  storageBucket:     "dashboard-elena.firebasestorage.app",
+  messagingSenderId: "660095373497",
+  appId:             "1:660095373497:web:7cdbedfb2c1d142ec9cb68"
+});
+const _auth = getAuth(_fbApp);
 
-  if(sessionStorage.getItem(SK)==='1'){
-    document.addEventListener('DOMContentLoaded',unlock);
-  }
+function _unlock(){
+  var ls = document.getElementById('login-screen');
+  if(ls) ls.style.display='none';
+}
+function _lock(){
+  var ls = document.getElementById('login-screen');
+  if(ls) ls.style.display='flex';
+}
 
-  function doLogin(){
-    var uel = document.getElementById('l-user');
-    var pel = document.getElementById('l-pwd');
-    var err = document.getElementById('l-err');
-    var btn = document.getElementById('l-btn');
-    var u   = uel ? uel.value.trim().toLowerCase() : '';
-    var p   = pel ? pel.value : '';
-    btn.textContent='Verificando...'; btn.disabled=true;
-    setTimeout(function(){
-      if(u===CU && p===CP){
-        unlock();
-      } else {
-        if(err) err.style.display='block';
-        btn.textContent='Entrar'; btn.disabled=false;
-        setTimeout(function(){if(err)err.style.display='none';},3000);
-      }
-    },300);
-  }
+onAuthStateChanged(_auth, function(user){
+  if(user){ _unlock(); } else { _lock(); }
+});
 
-  document.addEventListener('DOMContentLoaded',function(){
-    var btn=document.getElementById('l-btn');
-    var pel=document.getElementById('l-pwd');
-    var uel=document.getElementById('l-user');
-    if(btn) btn.addEventListener('click',doLogin);
-    if(pel) pel.addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
-    if(uel) uel.addEventListener('keydown',function(e){if(e.key==='Enter')pel.focus();});
-  });
-})();
+function doLogin(){
+  var uel = document.getElementById('l-user');
+  var pel = document.getElementById('l-pwd');
+  var err = document.getElementById('l-err');
+  var btn = document.getElementById('l-btn');
+  var email = uel ? uel.value.trim() : '';
+  var pwd   = pel ? pel.value : '';
+  btn.textContent='Entrando...'; btn.disabled=true;
+  signInWithEmailAndPassword(_auth, email, pwd)
+    .then(function(){ btn.textContent='Entrar'; btn.disabled=false; })
+    .catch(function(){
+      if(err){ err.textContent='E-mail ou senha incorretos'; err.style.display='block'; }
+      btn.textContent='Entrar'; btn.disabled=false;
+      setTimeout(function(){ if(err) err.style.display='none'; }, 3000);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  var btn = document.getElementById('l-btn');
+  var pel = document.getElementById('l-pwd');
+  var uel = document.getElementById('l-user');
+  if(btn) btn.addEventListener('click', doLogin);
+  if(pel) pel.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+  if(uel) uel.addEventListener('keydown', function(e){ if(e.key==='Enter') pel.focus(); });
+});
 </script>
 </body>
 </html>
