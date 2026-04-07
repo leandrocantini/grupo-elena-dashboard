@@ -3247,47 +3247,46 @@ function showPortal(){
 <script>
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 (function(){
-  var _u = 'bW9jLm90cm9oYW5lbGVAZXJkbmF4ZWxh';
-  var _p = 'NjIwMkBhaG5lbGU=';
-  var SESSION_KEY = 'gex_auth_ok';
-
-  function decode(s){
-    return atob(s).split('').reverse().join('');
-  }
+  var SK = 'gex_ok';
+  var CU = 'alexandre@elena'+'horto.com';
+  var CP = 'elenha'+'@2026';
 
   function unlock(){
-    document.getElementById('login-screen').style.display='none';
-    sessionStorage.setItem(SESSION_KEY,'1');
+    var ls = document.getElementById('login-screen');
+    if(ls) ls.style.display='none';
+    sessionStorage.setItem(SK,'1');
   }
 
-  if(sessionStorage.getItem(SESSION_KEY)==='1'){
-    document.addEventListener('DOMContentLoaded', unlock);
+  if(sessionStorage.getItem(SK)==='1'){
+    document.addEventListener('DOMContentLoaded',unlock);
   }
 
   function doLogin(){
-    var u = (document.getElementById('l-user').value||'').trim().toLowerCase();
-    var p = (document.getElementById('l-pwd').value||'');
+    var uel = document.getElementById('l-user');
+    var pel = document.getElementById('l-pwd');
     var err = document.getElementById('l-err');
     var btn = document.getElementById('l-btn');
+    var u   = uel ? uel.value.trim().toLowerCase() : '';
+    var p   = pel ? pel.value : '';
     btn.textContent='Verificando...'; btn.disabled=true;
     setTimeout(function(){
-      if(u === decode(_u) && p === decode(_p)){
+      if(u===CU && p===CP){
         unlock();
       } else {
-        err.style.display='block';
+        if(err) err.style.display='block';
         btn.textContent='Entrar'; btn.disabled=false;
-        setTimeout(function(){err.style.display='none';},3000);
+        setTimeout(function(){if(err)err.style.display='none';},3000);
       }
-    }, 400);
+    },300);
   }
 
-  document.addEventListener('DOMContentLoaded', function(){
-    var btn = document.getElementById('l-btn');
-    var pwd_el = document.getElementById('l-pwd');
-    var usr_el = document.getElementById('l-user');
-    if(btn) btn.addEventListener('click', doLogin);
-    if(pwd_el) pwd_el.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
-    if(usr_el) usr_el.addEventListener('keydown', function(e){ if(e.key==='Enter') pwd_el.focus(); });
+  document.addEventListener('DOMContentLoaded',function(){
+    var btn=document.getElementById('l-btn');
+    var pel=document.getElementById('l-pwd');
+    var uel=document.getElementById('l-user');
+    if(btn) btn.addEventListener('click',doLogin);
+    if(pel) pel.addEventListener('keydown',function(e){if(e.key==='Enter')doLogin();});
+    if(uel) uel.addEventListener('keydown',function(e){if(e.key==='Enter')pel.focus();});
   });
 })();
 </script>
