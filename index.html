@@ -3247,14 +3247,12 @@ function showPortal(){
 <script>
 // ── AUTH ──────────────────────────────────────────────────────────────────────
 (function(){
-  var SALT  = 'iogar2026elena';
-  var H_USR = 'a81b537c36a027be91f39f36e199577de71440108f034d49220cc4dad64a40df';
-  var H_PWD = 'a151f8e229ac4b5604d0d2666f5112b2bbc9156c3920713ee9274975208dc4de';
+  var _u = 'bW9jLm90cm9oYW5lbGVAZXJkbmF4ZWxh';
+  var _p = 'NjIwMkBhaG5lbGU=';
   var SESSION_KEY = 'gex_auth_ok';
 
-  async function sha256(msg){
-    var buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(msg));
-    return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+  function decode(s){
+    return atob(s).split('').reverse().join('');
   }
 
   function unlock(){
@@ -3262,36 +3260,34 @@ function showPortal(){
     sessionStorage.setItem(SESSION_KEY,'1');
   }
 
-  // Already authenticated this session?
   if(sessionStorage.getItem(SESSION_KEY)==='1'){
     document.addEventListener('DOMContentLoaded', unlock);
   }
 
   function doLogin(){
-    var u = document.getElementById('l-user').value.trim().toLowerCase();
-    var p = document.getElementById('l-pwd').value;
+    var u = (document.getElementById('l-user').value||'').trim().toLowerCase();
+    var p = (document.getElementById('l-pwd').value||'');
     var err = document.getElementById('l-err');
     var btn = document.getElementById('l-btn');
     btn.textContent='Verificando...'; btn.disabled=true;
-    Promise.all([sha256(u+SALT), sha256(p+SALT)]).then(function(hashes){
-      if(hashes[0]===H_USR && hashes[1]===H_PWD){
+    setTimeout(function(){
+      if(u === decode(_u) && p === decode(_p)){
         unlock();
       } else {
         err.style.display='block';
         btn.textContent='Entrar'; btn.disabled=false;
         setTimeout(function(){err.style.display='none';},3000);
       }
-    });
+    }, 400);
   }
 
   document.addEventListener('DOMContentLoaded', function(){
-    document.getElementById('l-btn').addEventListener('click', doLogin);
-    document.getElementById('l-pwd').addEventListener('keydown', function(e){
-      if(e.key==='Enter') doLogin();
-    });
-    document.getElementById('l-user').addEventListener('keydown', function(e){
-      if(e.key==='Enter') document.getElementById('l-pwd').focus();
-    });
+    var btn = document.getElementById('l-btn');
+    var pwd_el = document.getElementById('l-pwd');
+    var usr_el = document.getElementById('l-user');
+    if(btn) btn.addEventListener('click', doLogin);
+    if(pwd_el) pwd_el.addEventListener('keydown', function(e){ if(e.key==='Enter') doLogin(); });
+    if(usr_el) usr_el.addEventListener('keydown', function(e){ if(e.key==='Enter') pwd_el.focus(); });
   });
 })();
 </script>
